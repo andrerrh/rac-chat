@@ -1,7 +1,5 @@
-import sequelize from './src/db';
-import User from './src/models/User';
-
-
+import sequelize from './src/db.ts';
+import User from './src/models/User.ts';
 
 // import express from "express";
 // import cors from "cors";
