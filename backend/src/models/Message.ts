@@ -1,39 +1,40 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../db.ts';
 
-class User extends Model {
+class Message extends Model {
 	id!: number;
-	name!: string;
-	password!: string;
+	sender_id!: number;
+	receiver_id!: number;
+	message!: string;
 
 	readonly createdAt!: Date;
 	readonly updatedAt!: Date;
 }
 
-User.init(
+Message.init(
 	{
 		id: {
 			type: DataTypes.INTEGER,
 			autoIncrement: true,
 			primaryKey: true,
 		},
-		username: {
-			type: new DataTypes.STRING(128),
+		sender_id: {
+			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
-		password: {
-			type: new DataTypes.STRING(128),
+		receiver_id: {
+			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
-		avatarPath: {
-			type: DataTypes.STRING,
-			allowNull: true
-		}
+		message: {
+			type: new DataTypes.TEXT,
+			allowNull: false,
+		},
 	},
 	{
-		tableName: 'users',
+		tableName: 'messages',
 		sequelize,
 	}
 )
 
-export default User;
+export default Message;

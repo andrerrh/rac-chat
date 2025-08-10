@@ -1,5 +1,8 @@
 import sequelize from './src/db.ts';
 import User from './src/models/User.ts';
+import Message from './src/models/Message.ts'
+
+sequelize.sync()
 
 // import express from "express";
 // import cors from "cors";
