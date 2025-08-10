@@ -8,8 +8,6 @@ import User from './src/models/User.ts';
 import Message from './src/models/Message.ts'
 import userRoute from './api/user.ts';
 
-import UserRepository from './src/repositories/UserRepository.ts'
-
 sequelize.sync();
 
 const app = express();
@@ -24,8 +22,6 @@ if (!fs.existsSync(uploadDest)) {
 }
 
 app.use('/user', userRoute);
-
-UserRepository()
 
 app.listen(3000, () => {
 	console.log("Listening")
