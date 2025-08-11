@@ -21,8 +21,9 @@ if (!fs.existsSync(uploadDest)) {
 	fs.mkdirSync(uploadDest, { recursive: true });
 }
 
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/user', userRoute);
 
 app.listen(3000, () => {
-	console.log("Listening")
+	console.log("Listening on port 3000");
 })

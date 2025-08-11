@@ -15,10 +15,21 @@ import { Input } from '@/components/ui/input'
 import { PasswordInput } from "@/components/PasswordInput";
 
 import { registerSchema, type RegisterInput } from "@/schemas/user.schema";
+import { useCreateUser } from "@/hooks/useCreateUser";
 
 export function RegisterPage() {
-  const handleSubmit = (values: RegisterInput) => {
-    console.log(values);
+
+  const {
+    mutate: createUser,
+    isPending,
+  } = useCreateUser();
+
+  const handleSubmit = (data: any) => {
+    const formData = new FormData()
+    formData.append("username", data.username);
+    formData.append("password", data.password);
+    formData.append("avatar", data.avatar[0]);
+    createUser(formData);
   }
 
   const form = useForm<RegisterInput>({
@@ -90,7 +101,12 @@ export function RegisterPage() {
             </FormItem>
           )}
         />
-        <Button type="submit">Cadastrar</Button>
+        <Button
+          disabled={isPending}
+          type="submit"
+        >
+          Cadastrar
+        </Button>
       </form>
     </Form>
   )

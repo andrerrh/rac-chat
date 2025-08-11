@@ -11,7 +11,7 @@ const upload = multer({ dest: uploadDest });
 
 router.post("/register", upload.single('avatar'), async (req: Request, res: Response) => {
 	const { username, password } = req.body;
-	const avatarPath = req.file?.path || "";
+	const avatarPath = `/uploads/avatar/${req.file?.filename}` || "";
 
 	const userData = { username, password, avatarPath };
 

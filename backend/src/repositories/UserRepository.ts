@@ -13,6 +13,7 @@ const createUser = async (data: UserData): Promise<UserCreateResponse> => {
 			success: true,
 			message: "Usuário registrado com sucesso",
 			createdUser: {
+				id: response.dataValues.id,
 				username: response.dataValues.username,
 				avatarPath: response.dataValues.avatarPath,
 				createdAt: response.dataValues.createdAt,

@@ -21,12 +21,11 @@ export const registerSchema = z.object({
 	confirmPassword: z.string(),
 	avatar: z
 		.any()
-		.refine((files) => (
-			files?.length === 1 && ["image/png", "image/jpeg"].includes(files[0]?.type),
-				{ message: "O avatar deve ser um arquivo PNG ou JPEG" }
-		))
-		.refine((files) => files?.[0]?.size <= 5 * 1024 * 1024, {
-			message: "O arquivo deve ter no máximo 5MB",
+		.refine(files => files?.length === 1 && ["image/png", "image/jpeg"].includes(files[0]?.type), {
+			message: "O avatar deve ser um arquivo PNG ou JPEG"
+		})
+		.refine(files => files?.[0]?.size <= 5 * 1024 * 1024, {
+			message: "O arquivo deve ter no máximo 5MB"
 		}),
 })
 	.check(z.refine((data) => data.password === data.confirmPassword, {
