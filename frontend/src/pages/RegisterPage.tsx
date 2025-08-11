@@ -42,6 +42,10 @@ export function RegisterPage() {
   })
 
   return (
+    <div className="space-y-4 flex flex-col items-center m-auto">
+      <h2
+        className="text-xl"
+      >Cadastre um novo usuário</h2>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
@@ -101,6 +105,7 @@ export function RegisterPage() {
           )}
         />
         <Button
+          className="text-white"
           disabled={isPending}
           type="submit"
         >
@@ -108,5 +113,6 @@ export function RegisterPage() {
         </Button>
       </form>
     </Form>
+    </div>
   )
 }

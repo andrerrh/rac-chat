@@ -13,7 +13,7 @@ const login = async (userData: Login): Promise<LoginResponse> => {
 	})
 
 	const data: LoginResponse = await response.json();
-	if (!data.register.success) throw new Error(data.register.message);
+	if (!data.register.success) throw new Error("Erro ao logar usuário");
 	return data;
 }
 
@@ -21,7 +21,11 @@ const useLogin = () => {
 	return useMutation<LoginResponse, Error, Login>({
 		mutationFn: login,
 		onSuccess: (data) => {
+			console.log(data)
 			toast.success(data.register.message);
+			localStorage.setItem('token', data.token);
+			localStorage.setItem('username', data.register.user.username);
+			localStorage.setItem('avatar', data.register.user.avatarPath);
 		},
 		onError: (data) => {
 			toast.error(data.message || "Erro ao logar usuário", {

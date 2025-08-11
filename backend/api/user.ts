@@ -56,10 +56,13 @@ router.post("/login", async (req: Request, res: Response) => {
 	if (userRegister.success) {
 		const doesMatch = await comparePassword(password, userRegister.user.password!);
 		if (!doesMatch) {
-			return res.status(400).json({
-				success: false,
-				message: "Usuário ou senha inválidos",
+			res.status(400).json({
+				register: {
+					success: false,
+					message: "Usuário ou senha inválidos",
+				}
 			})
+			return;
 		}
 
 		delete userRegister.user.password;

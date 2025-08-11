@@ -18,14 +18,7 @@ import { useLogin } from "@/hooks/useLogin";
 
 export function LoginPage() {
 
-  const {mutate: loginUser, data: loginData} = useLogin();
-
-  const handleLogin = async (data: any) => {
-    await loginUser(data);
-    if(!loginData?.register.success) return;
-
-    localStorage.setItem('token', loginData.token);
-  }
+  const { mutate: loginUser } = useLogin();
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -36,40 +29,46 @@ export function LoginPage() {
   })
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Usuário</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Senha</FormLabel>
-              <FormControl>
-                <PasswordInput field={field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button
-          type="submit"
-        >
-          Entrar
-        </Button>
-      </form>
-    </Form>
+    <div className="space-y-4 flex flex-col items-center m-auto">
+      <h2
+        className="text-xl"
+      >Login de usuário</h2>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit((data) => loginUser(data))} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Usuário</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Senha</FormLabel>
+                <FormControl>
+                  <PasswordInput field={field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            className="text-white"
+            type="submit"
+          >
+            Entrar
+          </Button>
+        </form>
+      </Form>
+    </div>
   )
 }

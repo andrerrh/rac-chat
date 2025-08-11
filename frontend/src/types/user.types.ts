@@ -35,7 +35,9 @@ interface GetAllUsersResponse extends Responses {
 
 interface LoginResponse {
 	token: string;
-	register: Responses & User;
+	register: Responses & {
+		user: User
+	};
 }
 
 
