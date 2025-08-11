@@ -4,9 +4,12 @@ interface UserData {
 	avatarPath: string | null;
 }
 
-interface UserCreateResponse {
-	success: boolean;
-	message: string;
+interface Response {
+	success: boolean,
+	message: string,
+}
+
+interface UserCreateResponse extends Response {
 	createdUser?: {
 		id: string;
 		username: string;
@@ -15,7 +18,17 @@ interface UserCreateResponse {
 	}
 }
 
+interface LoginResponse extends Response {
+	user?: {
+		id: string,
+		username: string,
+		password?: string,
+		avatarPath: string | null,
+	}
+}
+
 export type {
 	UserData,
-	UserCreateResponse
+	UserCreateResponse,
+	LoginResponse,
 }

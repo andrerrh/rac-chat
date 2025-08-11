@@ -1,5 +1,5 @@
 import User from '../models/User.ts';
-import type { UserData, UserCreateResponse } from "../../types/user.types.ts";
+import type { UserData, UserCreateResponse, LoginResponse } from "../../types/user.types.ts";
 import { UniqueConstraintError } from 'sequelize';
 
 const createUser = async (data: UserData): Promise<UserCreateResponse> => {
@@ -64,7 +64,7 @@ const getUserById = async (userId: string) => {
 			attributes: ["id", "username", "avatarPath"],
 		})
 
-		if (!response) throw 404;
+		if (!response) throw new Error("Usuário não encontrado");
 
 		return {
 			success: true,
@@ -81,18 +81,20 @@ const getUserById = async (userId: string) => {
 	}
 }
 
-const getUserByUsername = async (username: string) => {
+const getUserByUsername = async (username: string): Promise<LoginResponse> => {
 	try {
 		const response = await User.findOne({
 			where: { username },
-			attributes: ["id", "username", "avatarPath"],
+			attributes: ["id", "username", "password", "avatarPath"],
 		})
-		if (!response) throw 404;
+		if (!response) throw new Error("Usuário não encontrado");
+
+		const user = response.get({plain: true});
 
 		return {
 			success: true,
 			message: "Usuário encontrado",
-			user: response,
+			user: user,
 		}
 
 	} catch (error: any) {

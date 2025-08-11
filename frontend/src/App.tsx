@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 
 import { RegisterPage } from './pages/RegisterPage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
+import { Home } from './pages/Home.tsx';
 
 const queryClient = new QueryClient();
 
@@ -14,6 +15,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LoginPage />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </BrowserRouter>

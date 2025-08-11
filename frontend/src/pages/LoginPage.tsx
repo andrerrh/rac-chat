@@ -18,14 +18,13 @@ import { useLogin } from "@/hooks/useLogin";
 
 export function LoginPage() {
 
-  const {mutate: loginUser, data: superData} = useLogin();
+  const {mutate: loginUser, data: loginData} = useLogin();
 
-  const handleLogin = (data: any) => {
-    const formData = new FormData()
-    formData.append("username", data.username);
-    formData.append("password", data.password);
-    loginUser(formData);
-    console.log(superData)
+  const handleLogin = async (data: any) => {
+    await loginUser(data);
+    if(!loginData?.register.success) return;
+
+    localStorage.setItem('token', loginData.token);
   }
 
   const form = useForm<LoginInput>({

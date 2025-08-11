@@ -15,6 +15,11 @@ interface User {
 	avatarPath: string,
 }
 
+interface Login {
+	username: string,
+	password: string,
+}
+
 interface UserCreateResponse extends Responses {
 	createdUser?: User & { createdAt: Date };
 }
@@ -28,12 +33,14 @@ interface GetAllUsersResponse extends Responses {
 	users: User[];
 }
 
-interface LoginResponse extends Responses {
-	user: User;
+interface LoginResponse {
+	token: string;
+	register: Responses & User;
 }
 
 
 export type {
+	Login,
 	getUserResponse,
 	UserFormData,
 	UserCreateResponse,
