@@ -13,7 +13,6 @@ import {
 import { Input } from '@/components/ui/input'
 
 import { PasswordInput } from "@/components/PasswordInput";
-
 import { registerSchema, type RegisterInput } from "@/schemas/user.schema";
 import { useCreateUser } from "@/hooks/useCreateUser";
 
@@ -28,7 +27,7 @@ export function RegisterPage() {
     const formData = new FormData()
     formData.append("username", data.username);
     formData.append("password", data.password);
-    formData.append("avatar", data.avatar[0]);
+    if(data.avatar) formData.append("avatar", data.avatar[0]);
     createUser(formData);
   }
 

@@ -2,15 +2,9 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import type { ControllerRenderProps } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import type { RegisterInput } from "@/schemas/user.schema";
 
-interface PasswordInputProps {
-  field: ControllerRenderProps<RegisterInput, 'password' | 'confirmPassword'>
-}
-
-export function PasswordInput({ field }: PasswordInputProps) {
+export function PasswordInput({ field }: any) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   return (

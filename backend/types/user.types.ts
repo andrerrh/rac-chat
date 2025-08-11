@@ -1,7 +1,7 @@
 interface UserData {
 	username: string;
 	password: string;
-	avatarPath: string;
+	avatarPath: string | null;
 }
 
 interface UserCreateResponse {
@@ -10,7 +10,7 @@ interface UserCreateResponse {
 	createdUser?: {
 		id: string;
 		username: string;
-		avatarPath: string;
+		avatarPath: string | null;
 		createdAt: Date;
 	}
 }

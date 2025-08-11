@@ -8,7 +8,7 @@ const delay = (ms: number) => {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-await delay(5000);
+await delay(2000);
 
 const sequelize = new Sequelize(`${process.env.DATABASE_URL}`)
 

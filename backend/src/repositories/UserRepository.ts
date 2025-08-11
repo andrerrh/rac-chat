@@ -1,5 +1,6 @@
 import User from '../models/User.ts';
 import type { UserData, UserCreateResponse } from "../../types/user.types.ts";
+import { UniqueConstraintError } from 'sequelize';
 
 const createUser = async (data: UserData): Promise<UserCreateResponse> => {
 	try {
@@ -20,6 +21,12 @@ const createUser = async (data: UserData): Promise<UserCreateResponse> => {
 			}
 		}
 	} catch (error: any) {
+		if (error instanceof UniqueConstraintError) {
+			return {
+				success: false,
+				message: "Nome de usuário já existe",
+			}
+		}
 		console.error("Erro ao criar usuário", error);
 
 		return {
@@ -51,21 +58,45 @@ const getAllUsers = async () => {
 	}
 }
 
-const getUser = async (userId: string) => {
+const getUserById = async (userId: string) => {
 	try {
 		const response = await User.findByPk(userId, {
 			attributes: ["id", "username", "avatarPath"],
 		})
 
-		if(!response) throw 404;
+		if (!response) throw 404;
 
 		return {
 			success: true,
 			message: "Usuário encontrado",
 			user: response,
 		}
-	} catch(error: any) {
+	} catch (error: any) {
 		console.error("Erro ao listar usuário");
+
+		return {
+			success: false,
+			message: "Erro ao listar usuário",
+		}
+	}
+}
+
+const getUserByUsername = async (username: string) => {
+	try {
+		const response = await User.findOne({
+			where: { username },
+			attributes: ["id", "username", "avatarPath"],
+		})
+		if (!response) throw 404;
+
+		return {
+			success: true,
+			message: "Usuário encontrado",
+			user: response,
+		}
+
+	} catch (error: any) {
+		console.log("Erro ao listar usuário")
 
 		return {
 			success: false,
@@ -77,5 +108,6 @@ const getUser = async (userId: string) => {
 export default {
 	createUser,
 	getAllUsers,
-	getUser,
+	getUserById,
+	getUserByUsername,
 }
