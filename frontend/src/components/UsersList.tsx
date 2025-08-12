@@ -1,14 +1,12 @@
 import { useGetAllUsers } from "../hooks/useGetAllUsers";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { socket } from "@/lib/socketConnection";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export function UsersList() {
 
   const { data } = useGetAllUsers();
-
-  console.log(data)
-
   if (!data) return <div>Carregando...</div>
 
   return (
@@ -18,6 +16,7 @@ export function UsersList() {
 
       {data.users.map(user => (
         <span
+          key={user.id}
           className="flex pl-4 space-x-4 items-center select-none hover:backdrop-brightness-150 rounded-md"
         >
           <Avatar>

@@ -10,6 +10,7 @@ import { Home } from './pages/Home.tsx';
 import { SidebarProvider, SidebarTrigger } from './components/ui/sidebar.tsx';
 import { AppSidebar } from './components/AppSidebar.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
+import { ChatPage } from './pages/ChatPage.tsx';
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ function App() {
           <Routes>
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Home />} />
+              <Route path="/chat" element={<ChatPage />} />
             </Route>
             <Route path="/login" element={<LoginPage
               user={user}

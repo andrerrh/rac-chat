@@ -20,10 +20,22 @@ const expressServer = app.listen(PORT, () => {
 	console.log(`Aberto na porta ${PORT}`);
 })
 
-const io = new Server(expressServer);
+const io = new Server(expressServer, {
+	cors: {
+		origin: "http://localhost:5173"
+	}
+});
 
 io.on('connection', socket => {
 	console.log(`${socket.id} está online`);
+
+	socket.on("join_room", data => {
+		socket.join(data);
+	});
+
+	socket.on("send_message", data => {
+		socket.to(data.room).emit("receive_message", data);
+	})
 })
 
 
