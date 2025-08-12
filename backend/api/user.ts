@@ -54,7 +54,7 @@ router.post("/login", async (req: Request, res: Response) => {
 	const userRegister: LoginResponse = await UserRepository.getUserByUsername(username);
 
 	if (userRegister.success) {
-		const doesMatch = await comparePassword(password, userRegister.user.password!);
+		const doesMatch = await comparePassword(password, userRegister.user!.password!);
 		if (!doesMatch) {
 			res.status(400).json({
 				register: {

@@ -2,10 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import express from "express";
 import cors from "cors";
+import { Server } from 'socket.io';
 
 import sequelize from './src/db.ts';
-import User from './src/models/User.ts';
-import Message from './src/models/Message.ts'
 import userRoute from './api/user.ts';
 
 sequelize.sync();
@@ -15,8 +14,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-const uploadDest = path.join(process.cwd(), 'uploads/avatar');
+const PORT = 3000;
+
+const expressServer = app.listen(PORT, () => {
+	console.log(`Aberto na porta ${PORT}`);
+})
+
+const io = new Server(expressServer);
+
+io.on('connection', socket => {
+	console.log(`${socket.id} está online`);
+})
+
+
 //Cria o caminho para salvar os avatares caso não exista
+const uploadDest = path.join(process.cwd(), 'uploads/avatar');
 if (!fs.existsSync(uploadDest)) {
 	fs.mkdirSync(uploadDest, { recursive: true });
 }
@@ -24,6 +36,3 @@ if (!fs.existsSync(uploadDest)) {
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/user', userRoute);
 
-app.listen(3000, () => {
-	console.log("Listening on port 3000");
-})

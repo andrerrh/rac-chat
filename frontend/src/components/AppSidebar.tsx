@@ -3,6 +3,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/compone
 import { Button } from "./ui/button";
 import { DoorClosed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { UsersList } from "./UsersList";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -60,10 +61,8 @@ export function AppSidebar({user, setUser}: AppSidebarProps) {
       </SidebarHeader>
       {user &&
         <>
-          <SidebarContent className="overflow-y-auto flex-1 p-4 space-y-2">
-            {Array.from({ length: 30 }).map((_, i) => (
-              <h2 key={i}>teste {i + 1}</h2>
-            ))}
+          <SidebarContent >
+            <UsersList />
           </SidebarContent>
           <SidebarFooter className="border-t p-4">
             <Button
