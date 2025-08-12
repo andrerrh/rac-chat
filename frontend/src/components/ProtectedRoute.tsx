@@ -4,9 +4,7 @@ export function ProtectedRoute() {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('avatar');
+    localStorage.clear();
     return <Navigate to="/login" replace />;
   }
 
