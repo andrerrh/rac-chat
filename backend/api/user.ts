@@ -65,15 +65,20 @@ router.post("/login", async (req: Request, res: Response) => {
 			return;
 		}
 
-		delete userRegister.user.password;
+		delete userRegister!.user!.password;
 
-		const token = jwt.sign({ id: userRegister.user.id }, JWT_SECRET, { expiresIn: "1h" });
+		const token = jwt.sign({ id: userRegister!.user!.id }, JWT_SECRET, { expiresIn: "1h" });
 		res.status(200).json({
 			token,
 			register: userRegister
 		});
 	} else {
-		res.status(404).json(userRegister);
+		res.status(400).json({
+			register: {
+				success: false,
+				message: "Usuário ou senha inválidos",
+			}
+		})
 	}
 
 })

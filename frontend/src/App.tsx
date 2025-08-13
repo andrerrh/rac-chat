@@ -11,6 +11,7 @@ import { SidebarProvider, SidebarTrigger } from './components/ui/sidebar.tsx';
 import { AppSidebar } from './components/AppSidebar.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { ChatPage } from './pages/ChatPage.tsx';
+import { SelectedUserProvider } from './components/SelectedUserProvider.tsx';
 
 const queryClient = new QueryClient();
 
@@ -20,25 +21,27 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <SidebarProvider>
-          <AppSidebar
-            user={user}
-            setUser={setUser}
-          />
-          <SidebarTrigger />
-          <Routes>
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/chat" element={<ChatPage />} />
-            </Route>
-            <Route path="/login" element={<LoginPage
+        <SelectedUserProvider>
+          <SidebarProvider>
+            <AppSidebar
               user={user}
               setUser={setUser}
-            />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Routes>
-          <Toaster />
-        </SidebarProvider>
+            />
+            <SidebarTrigger />
+            <Routes>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/chat" element={<ChatPage />} />
+              </Route>
+              <Route path="/login" element={<LoginPage
+                user={user}
+                setUser={setUser}
+              />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Routes>
+            <Toaster />
+          </SidebarProvider>
+        </SelectedUserProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

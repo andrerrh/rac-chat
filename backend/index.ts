@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 
 import sequelize from './src/db.ts';
 import userRoute from './api/user.ts';
+import authRoute from './api/auth.ts';
 
 sequelize.sync();
 
@@ -47,4 +48,5 @@ if (!fs.existsSync(uploadDest)) {
 
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/user', userRoute);
+app.use('/auth', authRoute)
 

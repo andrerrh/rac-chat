@@ -42,6 +42,7 @@ interface LoginResponse {
 
 
 export type {
+	User,
 	Login,
 	getUserResponse,
 	UserFormData,
