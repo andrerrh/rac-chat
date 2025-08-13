@@ -3,11 +3,56 @@ import { Input } from "@/components/ui/input";
 import { SendHorizonal } from "lucide-react";
 import { useSelectedUser } from "@/components/SelectedUserProvider";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useEffect, useState } from "react";
+import { socket } from "@/lib/socketConnection";
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
+interface AnswerReceived {
+  username: string;
+  message: string;
+}
+
 export function ChatPage() {
+  const [message, setMessage] = useState(""); //Mensagem a ser enviada
+  const [messages, setMessages] = useState<Array<AnswerReceived>>([]); //Mensagens no display
+  const [room, setRoom] = useState("");
+
   const { selectedUser } = useSelectedUser();
-  console.log(selectedUser)
+
+  useEffect(() => {
+    const userId = localStorage.getItem('user_id');
+    let id1 = userId;
+    let id2 = selectedUser?.id;
+
+    if (id1 && id2) {
+      const [low, high] = [id1, id2].sort((a, b) => Number(a) - Number(b));
+      const roomId = `${low}_${high}`;
+      socket.emit('join_room', roomId);
+      setRoom(roomId);
+    }
+  }, [selectedUser, socket])
+
+  const handleMessageSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const userId = localStorage.getItem('user_id');
+    const username = localStorage.getItem('username');
+
+    if (!message.trim() || !room) return;
+    socket.emit('send_message', { userId, username, message, room });
+    setMessage("");
+  }
+
+  useEffect(() => {
+    socket.on('receive_message', (data) => {
+      setMessages(prev => [...prev, data]);
+    })
+
+    return () => {
+      socket.off('receive_message');
+    }
+  }, [])
+
 
   return (
     <>
@@ -39,21 +84,33 @@ export function ChatPage() {
         <div
           className="flex flex-col w-[90%] h-full bg-zinc-900 rounded-md mb-5"
           id="chat-display"
-        ></div>
-        <div
+        >
+          <ul>
+            {messages && messages.map((msg) => (
+              <li>{msg.message}</li>
+            ))}
+          </ul>
+        </div>
+        <form
+          onSubmit={handleMessageSubmit}
           className={`
             flex
             w-[90%]
             xl:w-[50%]
             space-x-4`}
         >
-          <Input />
+          <Input
+            placeholder="Digite sua mensagem..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
           <Button
+            type="submit"
             className="text-white !rounded-full"
           >
             <SendHorizonal />
           </Button>
-        </div>
+        </form>
       </div>
     </>
   )

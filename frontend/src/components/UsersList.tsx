@@ -1,6 +1,5 @@
 import { useGetAllUsers } from "../hooks/useGetAllUsers";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { socket } from "@/lib/socketConnection";
 import { useSelectedUser } from "./SelectedUserProvider";
 import type { User } from "@/types/user.types";
 import { useNavigate } from "react-router-dom";

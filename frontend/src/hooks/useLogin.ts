@@ -13,7 +13,6 @@ const login = async (userData: Login): Promise<LoginResponse> => {
 	})
 
 	const data: LoginResponse = await response.json();
-	console.log(data)
 	if (!data.register.success) throw new Error(data.register.message);
 	return data;
 }
@@ -24,6 +23,7 @@ const useLogin = () => {
 		onSuccess: (data) => {
 			toast.success(data.register.message);
 			localStorage.setItem('token', data.token);
+			localStorage.setItem('user_id', data.register.user.id);
 			localStorage.setItem('username', data.register.user.username);
 			localStorage.setItem('avatar', data.register.user.avatarPath);
 		},

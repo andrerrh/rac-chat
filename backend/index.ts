@@ -30,12 +30,13 @@ const io = new Server(expressServer, {
 io.on('connection', socket => {
 	console.log(`${socket.id} está online`);
 
-	socket.on("join_room", data => {
-		socket.join(data);
+	socket.on("join_room", room => {
+		console.log(`${socket.id} entrou na sala ${room}`)
+		socket.join(room);
 	});
 
 	socket.on("send_message", data => {
-		socket.to(data.room).emit("receive_message", data);
+		io.to(data.room).emit("receive_message", {sender: data.username, message: data.message});
 	})
 })
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import type { User } from '../types/user.types';
 
 interface SelectedUserContextType {
@@ -13,7 +13,21 @@ interface SelectedUserProviderProps {
 const SelectedUserContext = createContext<SelectedUserContextType | undefined>(undefined);
 
 export function SelectedUserProvider({ children }: SelectedUserProviderProps) {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  
+  //Persiste o usuário selecionado ao dar refresh na página
+  const [selectedUser, setSelectedUser] = useState<User | null>(() => {
+    const stored = localStorage.getItem('selected_user');
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  useEffect(() => {
+    if (selectedUser) {
+      localStorage.setItem('selected_user', JSON.stringify(selectedUser));
+    } else {
+      localStorage.removeItem('selected_user');
+    }
+  }, [selectedUser])
+
   return (
     <SelectedUserContext.Provider value={{ selectedUser, setSelectedUser }}>
       {children}
@@ -23,9 +37,8 @@ export function SelectedUserProvider({ children }: SelectedUserProviderProps) {
 
 export function useSelectedUser(): SelectedUserContextType {
   const context = useContext(SelectedUserContext);
-  if(!context) {
+  if (!context) {
     throw new Error("Sem contexto para SelectedUserProvider");
   }
-
   return context;
 }
