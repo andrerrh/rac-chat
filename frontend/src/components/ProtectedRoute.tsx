@@ -2,7 +2,11 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 const apiUrl = import.meta.env.VITE_API_URL;
 
-export function ProtectedRoute() {
+interface ProtectedRouteProps {
+  setUser: React.Dispatch<React.SetStateAction<{username: string | null; avatar: string | null } | null>>
+}
+
+export function ProtectedRoute({setUser}: ProtectedRouteProps) {
   const [isValid, setIsValid] = useState<null | boolean>(null);
 
   useEffect(() => {
@@ -29,6 +33,7 @@ export function ProtectedRoute() {
   if (isValid === null) return <div>Carregando...</div>;
   if (!isValid) {
     localStorage.clear();
+    setUser(null);
     return <Navigate to="/login" replace />;
   }
 

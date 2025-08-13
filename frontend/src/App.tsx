@@ -29,7 +29,7 @@ function App() {
             />
             <SidebarTrigger />
             <Routes>
-              <Route element={<ProtectedRoute />}>
+              <Route element={<ProtectedRoute setUser={setUser} />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/chat" element={<ChatPage />} />
               </Route>

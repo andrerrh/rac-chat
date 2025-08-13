@@ -7,7 +7,11 @@ import { useNavigate } from "react-router-dom";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-export function UsersList() {
+interface AppSidebarProps {
+  loggedUsername: string | null;
+}
+
+export function UsersList({loggedUsername}: AppSidebarProps) {
   const { setSelectedUser } = useSelectedUser();
   const navigate = useNavigate();
 
@@ -24,7 +28,9 @@ export function UsersList() {
       className="overflow-y-auto flex-1 p-4 space-y-6"
     >
 
-      {data.users.map(user => (
+      {data.users
+        .filter(user => user.username != loggedUsername)
+        .map(user => (
         <span
           onClick={() => handleUserClick(user)}
           key={user.id}

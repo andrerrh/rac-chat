@@ -4,6 +4,8 @@ import { Button } from "./ui/button";
 import { DoorClosed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UsersList } from "./UsersList";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { Navigation } from "./Navigation";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -17,8 +19,8 @@ interface AppSidebarProps {
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-export function AppSidebar({user, setUser}: AppSidebarProps) {
-  
+export function AppSidebar({ user, setUser }: AppSidebarProps) {
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export function AppSidebar({user, setUser}: AppSidebarProps) {
 
   const logout = () => {
     localStorage.clear();
-    navigate("/login", {replace: true});
+    navigate("/login", { replace: true });
     setUser(null);
   }
 
@@ -48,33 +50,40 @@ export function AppSidebar({user, setUser}: AppSidebarProps) {
         className="flex items-center pt-8"
       >
         {!user ?
-          <h2>Faça Login</h2>
+          <Navigation />
           :
           <div className="space-y-4 flex flex-col items-center">
-            <img
-              className="w-12 h-12 bg-transparent rounded-full"
-              src={`${apiUrl}${user.avatar}`}
-            />
+            <Avatar
+              className="w-15 h-15"
+            >
+              <AvatarImage
+                src={`${apiUrl}${user.avatar}`}
+              />
+              <AvatarFallback className="capitalize">
+                {user.username?.substring(0, 2)}
+              </AvatarFallback>
+
+            </Avatar>
             <h2>{`Olá, ${user.username}!`}</h2>
           </div>
         }
       </SidebarHeader>
-      {user &&
-        <>
-          <SidebarContent >
-            <UsersList />
-          </SidebarContent>
-          <SidebarFooter className="border-t p-4">
-            <Button
-              onClick={logout}
-              className="text-white hover:text-red-600 hover:!border-red-600 !transition duration-200"
-            >
-              Sair
-              <DoorClosed />
-            </Button>
-          </SidebarFooter>
-        </>
-      }
+      <SidebarContent >
+        {user &&
+          <>
+            <UsersList loggedUsername={user.username} />
+            <SidebarFooter className="border-t p-4">
+              <Button
+                onClick={logout}
+                className="text-white hover:text-red-600 hover:!border-red-600 !transition duration-200"
+              >
+                Sair
+                <DoorClosed />
+              </Button>
+            </SidebarFooter>
+          </>
+        }
+      </SidebarContent>
     </Sidebar>
   );
 }
