@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../db.ts';
+import User from './User.ts';
 
 class Message extends Model {
 	id!: number;

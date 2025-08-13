@@ -7,6 +7,10 @@ import { Server } from 'socket.io';
 import sequelize from './src/db.ts';
 import userRoute from './api/user.ts';
 import authRoute from './api/auth.ts';
+import MessageRepository from './src/repositories/MessageRepository.ts';
+import User from './src/models/User.ts';
+import Message from './src/models/Message.ts';
+import type { SendMessageData } from './types/message.types.ts';
 
 sequelize.sync();
 
@@ -27,16 +31,35 @@ const io = new Server(expressServer, {
 	}
 });
 
+//Cria a relação de 1 para muitos de usuarios com mensagens
+User.hasMany(Message, {foreignKey: "sender_id", as: "sentMessages"});
+User.hasMany(Message, {foreignKey: "receiver_id", as: "receivedMessages"});
+Message.belongsTo(User, {foreignKey: "sender_id", as: "sender"});
+Message.belongsTo(User, {foreignKey: "receiver_id", as: "receiver"});
+
 io.on('connection', socket => {
 	console.log(`${socket.id} está online`);
 
-	socket.on("join_room", room => {
+	socket.on("join_room", async (room: string) => {
 		console.log(`${socket.id} entrou na sala ${room}`)
 		socket.join(room);
+
+		const response = await MessageRepository.getMessages(room);
+		console.log(response)
+		if (response.success) {
+			io.emit('message_history', response.register);
+		}
 	});
 
-	socket.on("send_message", data => {
-		io.to(data.room).emit("receive_message", {sender: data.username, message: data.message});
+	socket.on("send_message", (data: SendMessageData) => {
+		MessageRepository.createMessage(data.userId, data.receiverId, data.message);
+
+		io.to(data.room).emit("receive_message", {
+			userId: data.userId,
+			username: data.username,
+			message: data.message,
+			date: new Date()
+		});
 	})
 })
 

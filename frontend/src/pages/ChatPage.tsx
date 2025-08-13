@@ -5,12 +5,15 @@ import { useSelectedUser } from "@/components/SelectedUserProvider";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
 import { socket } from "@/lib/socketConnection";
+import { Message } from "@/components/message";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 interface AnswerReceived {
+  userId: string;
   username: string;
   message: string;
+  date: Date;
 }
 
 export function ChatPage() {
@@ -20,6 +23,7 @@ export function ChatPage() {
 
   const { selectedUser } = useSelectedUser();
 
+  //Conecta-se ao chat correto atraves do id do usuario logado e do selecionado
   useEffect(() => {
     const userId = localStorage.getItem('user_id');
     let id1 = userId;
@@ -39,14 +43,24 @@ export function ChatPage() {
     const username = localStorage.getItem('username');
 
     if (!message.trim() || !room) return;
-    socket.emit('send_message', { userId, username, message, room });
+    socket.emit('send_message', {
+      userId,
+      receiverId: selectedUser?.id,
+      username,
+      message,
+      room
+    });
     setMessage("");
   }
 
   useEffect(() => {
+    socket.on('message_history', (oldMessages) => {
+      console.log(oldMessages);
+    })
     socket.on('receive_message', (data) => {
       setMessages(prev => [...prev, data]);
     })
+
 
     return () => {
       socket.off('receive_message');
@@ -82,12 +96,19 @@ export function ChatPage() {
           </div>
         </div>
         <div
-          className="flex flex-col w-[90%] h-full bg-zinc-900 rounded-md mb-5"
+          className="flex flex-col w-[90%] h-full bg-zinc-900 rounded-md mb-5 p-5"
           id="chat-display"
         >
           <ul>
-            {messages && messages.map((msg) => (
-              <li>{msg.message}</li>
+            {messages && messages.map((msg, i) => (
+              <li key={`${msg.username} + ${i}`} className="mb-2">
+                <Message
+                  message={msg.message}
+                  username={msg.username}
+                  isSender={msg.userId == localStorage.getItem("user_id")}
+                  date={new Date(msg.date)}
+                />
+              </li>
             ))}
           </ul>
         </div>
