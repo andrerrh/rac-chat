@@ -17,13 +17,12 @@ import { registerSchema, type RegisterInput } from "@/schemas/user.schema";
 import { useCreateUser } from "@/hooks/useCreateUser";
 
 export function RegisterPage() {
-
   const {
     mutate: createUser,
     isPending,
   } = useCreateUser();
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = async (data: any) => {
     const formData = new FormData()
     formData.append("username", data.username);
     formData.append("password", data.password);

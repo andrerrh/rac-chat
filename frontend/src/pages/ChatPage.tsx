@@ -17,7 +17,6 @@ export function ChatPage() {
   const [message, setMessage] = useState(""); //Mensagem a ser enviada
   const [messages, setMessages] = useState<Array<ReceiveMessageProps>>([]); //Mensagens no display
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
   const [room, setRoom] = useState("");
 
   const { selectedUser } = useSelectedUser();
