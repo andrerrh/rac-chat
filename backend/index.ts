@@ -75,6 +75,10 @@ io.on('connection', socket => {
 			date: new Date()
 		});
 	})
+
+	socket.on("typing", (room: string) => {
+		socket.to(room).emit('contact_typing');
+	})
 })
 
 

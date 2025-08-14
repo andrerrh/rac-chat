@@ -1,19 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SendHorizonal } from "lucide-react";
+import { SendHorizonal, Smile } from "lucide-react";
 import { useSelectedUser } from "@/components/SelectedUserProvider";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Message } from "@/components/message";
 import type { HistoryMessagesProps, ReceiveMessageProps } from "@/types/message.types";
 import { useSocket } from "@/components/SocketProvider";
 import { useOnlineUsers } from "@/components/OnlineUsersProvider";
+import { CustomEmojiPicker } from "@/components/CustomEmojiPicker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export function ChatPage() {
   const [message, setMessage] = useState(""); //Mensagem a ser enviada
   const [messages, setMessages] = useState<Array<ReceiveMessageProps>>([]); //Mensagens no display
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
   const [room, setRoom] = useState("");
 
   const { selectedUser } = useSelectedUser();
@@ -50,6 +54,8 @@ export function ChatPage() {
     setMessage("");
   }
 
+  const typingTimer = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     socket?.on('message_history', (oldMessages: HistoryMessagesProps[]) => {
       const arr: ReceiveMessageProps[] = [];
@@ -63,21 +69,36 @@ export function ChatPage() {
       })
       setMessages(arr)
     })
+
     socket?.on('receive_message', (data: ReceiveMessageProps) => {
       setMessages(prev => [...prev, data]);
+    })
+
+    //Informação de que o usuario está digitando
+    socket?.on('contact_typing', () => {
+      setIsTyping(true);
+
+      if (typingTimer.current) clearTimeout(typingTimer.current);
+      typingTimer.current = setTimeout(() => setIsTyping(false), 2000);
     })
 
     return () => {
       socket?.off('message_history');
       socket?.off('receive_message');
+      socket?.off('contact_typing');
     }
   }, [])
+
+  const handleMessageTyping = (text: string) => {
+    socket?.emit("typing", room)
+    setMessage(text);
+  }
 
 
   return (
     <>
       <div
-        className="flex flex-col pb-4 justify-end w-full items-center space"
+        className="flex flex-col pb-4 h-screen justify-between w-full items-center space"
         id="chat-page-container"
       >
         <div
@@ -108,7 +129,7 @@ export function ChatPage() {
           </div>
         </div>
         <div
-          className="flex flex-col w-[90%] h-full bg-zinc-900 rounded-md mb-5 p-5"
+          className="flex flex-col w-[90%] h-full bg-zinc-900 rounded-md mb-5 p-5 overflow-y-auto"
           id="chat-display"
         >
           <ul>
@@ -123,6 +144,9 @@ export function ChatPage() {
               </li>
             ))}
           </ul>
+          {isTyping &&
+            <p>Digitando...</p>
+          }
         </div>
         <form
           onSubmit={handleMessageSubmit}
@@ -135,8 +159,20 @@ export function ChatPage() {
           <Input
             placeholder="Digite sua mensagem..."
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => handleMessageTyping(e.target.value)}
           />
+          <Popover>
+            <PopoverTrigger
+              className="!rounded-full w-14 h-9 flex justify-center items-center"
+            >
+              <Smile />
+            </PopoverTrigger>
+            <PopoverContent
+              className="p-0 w-fit"
+            >
+              <CustomEmojiPicker setMessage={setMessage} />
+            </PopoverContent>
+          </Popover>
           <Button
             type="submit"
             className="text-white !rounded-full"
