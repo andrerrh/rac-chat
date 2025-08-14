@@ -8,7 +8,7 @@ import UserRepository from "../src/repositories/UserRepository.ts";
 import { hashPassword, comparePassword } from "../utils/bcryptPass.ts";
 import type { LoginResponse } from "../types/user.types.ts";
 
-const JWT_SECRET = "4b014ec07dcc2946d6e6e9ed05eb664c";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const router = express.Router();
 const uploadDest = path.join(process.cwd(), 'uploads/avatar');
@@ -50,6 +50,14 @@ router.get("/:userId", async (req: Request, res: Response) => {
 })
 
 router.post("/login", async (req: Request, res: Response) => {
+	if (!JWT_SECRET) {
+		res.status(500).json({
+			register: {
+				success: false,
+				message: "Erro no servidor",
+			}
+		})
+	}
 	const { username, password } = req.body;
 	const userRegister: LoginResponse = await UserRepository.getUserByUsername(username);
 
@@ -67,7 +75,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
 		delete userRegister!.user!.password;
 
-		const token = jwt.sign({ id: userRegister!.user!.id }, JWT_SECRET, { expiresIn: "1h" });
+		const token = jwt.sign({ id: userRegister!.user!.id }, JWT_SECRET!, { expiresIn: "1h" });
 		res.status(200).json({
 			token,
 			register: userRegister

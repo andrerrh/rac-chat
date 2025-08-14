@@ -7,9 +7,8 @@ import { Server } from 'socket.io';
 import sequelize from './src/db.ts';
 import userRoute from './api/user.ts';
 import authRoute from './api/auth.ts';
-import MessageRepository from './src/repositories/MessageRepository.ts';
 import { setupAssociations } from './src/models/association.ts';
-import type { SendMessageData } from './types/message.types.ts';
+import { socketHandler } from './api/chat.ts';
 
 sequelize.sync();
 
@@ -20,7 +19,7 @@ app.use(cors());
 
 setupAssociations();
 
-const PORT = 3000;
+const PORT = process.env.PORT || '3000';
 
 const expressServer = app.listen(PORT, () => {
 	console.log(`Aberto na porta ${PORT}`);
@@ -32,53 +31,8 @@ const io = new Server(expressServer, {
 	}
 });
 
-const onlineUsers = new Set<string>();
-
 io.on('connection', socket => {
-
-	let userId: string | null = null;
-
-	//Atualiza novos clientes com clientes já online
-	socket.emit('online_users_list', Array.from(onlineUsers));
-
-	socket.on('online', (id) => {
-		console.log(`${socket.id} está online`);
-		userId = id;
-		onlineUsers.add(id);
-		io.emit('user_online', id);
-	})
-
-	socket.on('disconnect', _ => {
-		if(userId) {
-			onlineUsers.delete(userId);
-			io.emit('user_offline', userId);
-		}
-	})
-
-	socket.on("join_room", async (room: string) => {
-		console.log(`${socket.id} entrou na sala ${room}`)
-		socket.join(room);
-
-		const response = await MessageRepository.getMessages(room);
-		if (response.success) {
-			socket.emit('message_history', response.register);
-		}
-	});
-
-	socket.on("send_message", (data: SendMessageData) => {
-		MessageRepository.createMessage(data.userId, data.receiverId, data.message);
-
-		io.to(data.room).emit("receive_message", {
-			userId: data.userId,
-			username: data.username,
-			message: data.message,
-			date: new Date()
-		});
-	})
-
-	socket.on("typing", (room: string) => {
-		socket.to(room).emit('contact_typing');
-	})
+	socketHandler(io, socket);
 })
 
 
@@ -91,4 +45,3 @@ if (!fs.existsSync(uploadDest)) {
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/user', userRoute);
 app.use('/auth', authRoute)
-
