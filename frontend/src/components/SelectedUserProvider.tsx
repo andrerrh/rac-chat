@@ -37,8 +37,6 @@ export function SelectedUserProvider({ children }: SelectedUserProviderProps) {
 
 export function useSelectedUser(): SelectedUserContextType {
   const context = useContext(SelectedUserContext);
-  if (!context) {
-    throw new Error("Sem contexto para SelectedUserProvider");
-  }
+  if (!context) throw new Error("Sem contexto para SelectedUserProvider");
   return context;
 }

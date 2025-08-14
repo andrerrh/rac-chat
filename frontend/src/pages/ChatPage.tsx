@@ -4,24 +4,21 @@ import { SendHorizonal } from "lucide-react";
 import { useSelectedUser } from "@/components/SelectedUserProvider";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import { socket } from "@/lib/socketConnection";
 import { Message } from "@/components/message";
+import type { HistoryMessagesProps, ReceiveMessageProps } from "@/types/message.types";
+import { useSocket } from "@/components/SocketProvider";
+import { useOnlineUsers } from "@/components/OnlineUsersProvider";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-interface AnswerReceived {
-  userId: string;
-  username: string;
-  message: string;
-  date: Date;
-}
-
 export function ChatPage() {
   const [message, setMessage] = useState(""); //Mensagem a ser enviada
-  const [messages, setMessages] = useState<Array<AnswerReceived>>([]); //Mensagens no display
+  const [messages, setMessages] = useState<Array<ReceiveMessageProps>>([]); //Mensagens no display
   const [room, setRoom] = useState("");
 
   const { selectedUser } = useSelectedUser();
+  const { onlineUsers } = useOnlineUsers();
+  const { socket } = useSocket();
 
   //Conecta-se ao chat correto atraves do id do usuario logado e do selecionado
   useEffect(() => {
@@ -32,7 +29,7 @@ export function ChatPage() {
     if (id1 && id2) {
       const [low, high] = [id1, id2].sort((a, b) => Number(a) - Number(b));
       const roomId = `${low}_${high}`;
-      socket.emit('join_room', roomId);
+      socket?.emit('join_room', roomId);
       setRoom(roomId);
     }
   }, [selectedUser, socket])
@@ -43,7 +40,7 @@ export function ChatPage() {
     const username = localStorage.getItem('username');
 
     if (!message.trim() || !room) return;
-    socket.emit('send_message', {
+    socket?.emit('send_message', {
       userId,
       receiverId: selectedUser?.id,
       username,
@@ -54,16 +51,25 @@ export function ChatPage() {
   }
 
   useEffect(() => {
-    socket.on('message_history', (oldMessages) => {
-      console.log(oldMessages);
+    socket?.on('message_history', (oldMessages: HistoryMessagesProps[]) => {
+      const arr: ReceiveMessageProps[] = [];
+      oldMessages.forEach(curr => {
+        arr.push({
+          date: curr.createdAt,
+          username: curr.sender.username,
+          userId: String(curr.sender.id),
+          message: curr.message,
+        })
+      })
+      setMessages(arr)
     })
-    socket.on('receive_message', (data) => {
+    socket?.on('receive_message', (data: ReceiveMessageProps) => {
       setMessages(prev => [...prev, data]);
     })
 
-
     return () => {
-      socket.off('receive_message');
+      socket?.off('message_history');
+      socket?.off('receive_message');
     }
   }, [])
 
@@ -90,9 +96,15 @@ export function ChatPage() {
           <div>
             <p>{selectedUser?.username}</p>
             <span className="flex space-x-2 items-center">
-              <div className="w-2 h-2 bg-gray-700 rounded-full" />
-              <p>Offline</p>
+              <div
+                className={`w-2 h-2 rounded-full ${onlineUsers.has(String(selectedUser?.id) ?? "") ? "bg-green-500" : "bg-gray-700"
+                  }`}
+              />
+              <p>
+                {onlineUsers.has(String(selectedUser?.id) ?? "") ? "Online" : "Offline"}
+              </p>
             </span>
+
           </div>
         </div>
         <div

@@ -10,6 +10,7 @@ import { Navigation } from "./Navigation";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 type User = {
+  id: string | null;
   username: string | null;
   avatar: string | null;
 };
@@ -24,11 +25,12 @@ export function AppSidebar({ user, setUser }: AppSidebarProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const userId = localStorage.getItem("user_id");
     const username = localStorage.getItem("username");
     const avatar = localStorage.getItem("avatar");
 
     if (username) {
-      setUser({ username, avatar });
+      setUser({id: userId, username, avatar });
     } else {
       setUser(null);
     }

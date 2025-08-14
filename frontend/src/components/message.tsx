@@ -27,7 +27,7 @@ export function Message({ message, username, isSender, date }: MessageProps) {
       className={`
         flex
         flex-col
-        ${isSender ? "items-end" : "items-start"}
+        ${isSender ? "items-end ml-20" : "items-start mr-20"}
       `}
       id="message-container"
     >

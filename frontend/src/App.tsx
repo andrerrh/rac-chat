@@ -12,36 +12,43 @@ import { AppSidebar } from './components/AppSidebar.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { ChatPage } from './pages/ChatPage.tsx';
 import { SelectedUserProvider } from './components/SelectedUserProvider.tsx';
+import { OnlineUsersProvider } from './components/OnlineUsersProvider.tsx';
+import { SocketProvider } from './components/SocketProvider.tsx';
 
 const queryClient = new QueryClient();
 
 function App() {
-  const [user, setUser] = useState<{ username: string | null; avatar: string | null } | null>(null);
+  const [user, setUser] = useState<{
+    id: string | null;
+    username: string | null;
+    avatar: string | null;
+  } | null>(null);
 
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <SelectedUserProvider>
-          <SidebarProvider>
-            <AppSidebar
-              user={user}
-              setUser={setUser}
-            />
-            <SidebarTrigger />
-            <Routes>
-              <Route element={<ProtectedRoute setUser={setUser} />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/chat" element={<ChatPage />} />
-              </Route>
-              <Route path="/login" element={<LoginPage
-                user={user}
-                setUser={setUser}
-              />} />
-              <Route path="/register" element={<RegisterPage />} />
-            </Routes>
-            <Toaster />
-          </SidebarProvider>
-        </SelectedUserProvider>
+        <SocketProvider>
+          <OnlineUsersProvider>
+            <SelectedUserProvider>
+              <SidebarProvider>
+                <AppSidebar
+                  user={user}
+                  setUser={setUser}
+                />
+                <SidebarTrigger />
+                <Routes>
+                  <Route element={<ProtectedRoute setUser={setUser} />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/chat" element={<ChatPage />} />
+                  </Route>
+                  <Route path="/login" element={<LoginPage setUser={setUser} />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                </Routes>
+                <Toaster />
+              </SidebarProvider>
+            </SelectedUserProvider>
+          </OnlineUsersProvider>
+        </SocketProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

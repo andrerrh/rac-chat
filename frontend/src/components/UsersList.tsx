@@ -3,6 +3,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useSelectedUser } from "./SelectedUserProvider";
 import type { User } from "@/types/user.types";
 import { useNavigate } from "react-router-dom";
+import { useOnlineUsers } from "./OnlineUsersProvider";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -10,14 +11,16 @@ interface AppSidebarProps {
   loggedUsername: string | null;
 }
 
-export function UsersList({loggedUsername}: AppSidebarProps) {
+export function UsersList({ loggedUsername }: AppSidebarProps) {
   const { setSelectedUser } = useSelectedUser();
+  const { onlineUsers } = useOnlineUsers();
   const navigate = useNavigate();
 
   const handleUserClick = (user: User) => {
     setSelectedUser(user);
     navigate("/chat");
   }
+
 
   const { data } = useGetAllUsers();
   if (!data) return <div>Carregando...</div>
@@ -29,27 +32,36 @@ export function UsersList({loggedUsername}: AppSidebarProps) {
 
       {data.users
         .filter(user => user.username != loggedUsername)
-        .map(user => (
-        <span
-          onClick={() => handleUserClick(user)}
-          key={user.id}
-          className="flex pl-4 space-x-4 items-center select-none hover:backdrop-brightness-150 rounded-md"
-        >
-          <Avatar>
-            <AvatarImage src={`${apiUrl}${user.avatarPath}`} />
-            <AvatarFallback
-              className="capitalize"
-            >{user.username.substring(0, 2)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p key={user.id}>{user.username}</p>
-            <div className="flex space-x-2 items-center">
-              <div className="w-2 h-2 bg-gray-700 rounded-full" />
-              <p>Offline</p>
-            </div>
-          </div>
-        </span>
-      ))}
+        .map(user => {
+          const isOnline = onlineUsers.has(String(user.id));
+          return (
+            <span
+              onClick={() => handleUserClick(user)}
+              key={user.id}
+              className="flex pl-4 space-x-4 items-center select-none hover:backdrop-brightness-150 rounded-md"
+            >
+              <Avatar>
+                <AvatarImage src={`${apiUrl}${user.avatarPath}`} />
+                <AvatarFallback
+                  className="capitalize"
+                >{user.username.substring(0, 2)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p key={user.id}>{user.username}</p>
+                <div className="flex space-x-2 items-center">
+                  <div className={`
+                    w-2
+                    h-2
+                    ${isOnline ? "bg-green-500" : "bg-gray-700"}
+                    rounded-full
+                  `}
+                    />
+                  <p>{isOnline ? "Online" : "Offline"}</p>
+                </div>
+              </div>
+            </span>
+          )
+        })}
     </div>
   )
 }

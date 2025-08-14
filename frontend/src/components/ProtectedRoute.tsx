@@ -1,12 +1,19 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
-interface ProtectedRouteProps {
-  setUser: React.Dispatch<React.SetStateAction<{username: string | null; avatar: string | null } | null>>
+interface User {
+  id: string | null;
+  username: string | null;
+  avatar: string | null;
 }
 
-export function ProtectedRoute({setUser}: ProtectedRouteProps) {
+interface ProtectedRouteProps {
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+export function ProtectedRoute({ setUser }: ProtectedRouteProps) {
   const [isValid, setIsValid] = useState<null | boolean>(null);
 
   useEffect(() => {
@@ -39,4 +46,3 @@ export function ProtectedRoute({setUser}: ProtectedRouteProps) {
 
   return <Outlet />;
 }
-

@@ -8,8 +8,7 @@ import sequelize from './src/db.ts';
 import userRoute from './api/user.ts';
 import authRoute from './api/auth.ts';
 import MessageRepository from './src/repositories/MessageRepository.ts';
-import User from './src/models/User.ts';
-import Message from './src/models/Message.ts';
+import { setupAssociations } from './src/models/association.ts';
 import type { SendMessageData } from './types/message.types.ts';
 
 sequelize.sync();
@@ -18,6 +17,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+setupAssociations();
 
 const PORT = 3000;
 
@@ -31,23 +32,36 @@ const io = new Server(expressServer, {
 	}
 });
 
-//Cria a relação de 1 para muitos de usuarios com mensagens
-User.hasMany(Message, {foreignKey: "sender_id", as: "sentMessages"});
-User.hasMany(Message, {foreignKey: "receiver_id", as: "receivedMessages"});
-Message.belongsTo(User, {foreignKey: "sender_id", as: "sender"});
-Message.belongsTo(User, {foreignKey: "receiver_id", as: "receiver"});
+const onlineUsers = new Set<string>();
 
 io.on('connection', socket => {
-	console.log(`${socket.id} está online`);
+
+	let userId: string | null = null;
+
+	//Atualiza novos clientes com clientes já online
+	socket.emit('online_users_list', Array.from(onlineUsers));
+
+	socket.on('online', (id) => {
+		console.log(`${socket.id} está online`);
+		userId = id;
+		onlineUsers.add(id);
+		io.emit('user_online', id);
+	})
+
+	socket.on('disconnect', _ => {
+		if(userId) {
+			onlineUsers.delete(userId);
+			io.emit('user_offline', userId);
+		}
+	})
 
 	socket.on("join_room", async (room: string) => {
 		console.log(`${socket.id} entrou na sala ${room}`)
 		socket.join(room);
 
 		const response = await MessageRepository.getMessages(room);
-		console.log(response)
 		if (response.success) {
-			io.emit('message_history', response.register);
+			socket.emit('message_history', response.register);
 		}
 	});
 

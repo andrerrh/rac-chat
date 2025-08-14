@@ -18,24 +18,25 @@ import { useLogin } from "@/hooks/useLogin";
 import { useNavigate } from "react-router-dom";
 
 type User = {
+  id: string | null;
   username: string | null;
   avatar: string | null;
 };
 
 interface LoginPageProps {
-  user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-export function LoginPage({ user, setUser }: LoginPageProps) {
+export function LoginPage({ setUser }: LoginPageProps) {
   const navigate = useNavigate();
 
   const { mutate: loginUser, data: loginData } = useLogin();
 
-  if (localStorage.getItem("token")) {
+  if (localStorage.getItem("token") && loginData) {
     setUser({
-      username: loginData!.register.user.username,
-      avatar: loginData!.register.user.avatarPath,
+      id: loginData?.register.user.id,
+      username: loginData?.register.user.username,
+      avatar: loginData?.register.user.avatarPath,
     })
     navigate("/", { replace: true });
   }
