@@ -15,6 +15,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      NODE_ENV: development
       DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
       - postgres
@@ -26,6 +27,8 @@ services:
     build: ./frontend
     ports:
       - "5173:5173"
+    enviroment:
+      NODE_ENV: development
     depends_on:
       - backend
     volumes:
